@@ -8,7 +8,7 @@
 body{
   margin:0;
   font-family:Arial;
-  background: #D2B48C;
+  background:#D2B48C;
   color:#fff;
   display:flex;
   justify-content:center;
@@ -31,7 +31,7 @@ h2{margin:8px 0}
 }
 .card{
   aspect-ratio:1/1;
-  background:#000000;
+  background:green;
   border-radius:10px;
   font-size:28px;
   display:flex;
@@ -54,18 +54,31 @@ h2{margin:8px 0}
   color:#ffd54f;
   min-height:24px;
 }
+button{
+  margin:10px 0;
+  padding:10px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:#43a047;
+  color:#fff;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
 <div class="game">
   <h2>🧠 لعبة الذاكرة</h2>
-  <div class="level">
-    المستوى: <span id="level">1</span> / 20
-  </div>
+  <h2> eyad yossef</h>
+  <div class="level">المستوى: <span id="level">1</span> / 20</div>
   <div class="info">
     <div>⏱️ <span id="time">120</span>s</div>
     <div>🔁 <span id="moves">0</span></div>
   </div>
+
+  <!-- زر الإيقاف / التشغيل -->
+  <button id="pauseBtn">⏸️ إيقاف مؤقت</button>
+
   <div class="message" id="message"></div>
   <div class="grid" id="grid"></div>
 </div>
@@ -74,6 +87,17 @@ h2{margin:8px 0}
 const allSymbols = ["🍎","🍌","🍓","🍇","🍒","🍍","🥝","🍉","🍑","🍋","🍊","🥥","🍐","🥭","🍈","🍏"];
 let currentLevel = 1;
 let first=null, lock=false, moves=0, time=120, timer;
+let isPaused = false;
+
+const pauseBtn = document.getElementById("pauseBtn");
+pauseBtn.onclick = () => {
+  isPaused = !isPaused;
+  if(isPaused){
+    pauseBtn.textContent = "▶️ استئناف";
+  } else {
+    pauseBtn.textContent = "⏸️ إيقاف مؤقت";
+  }
+};
 
 function startLevel(){
   clearInterval(timer);
@@ -83,7 +107,7 @@ function startLevel(){
   document.getElementById("level").textContent = currentLevel;
   document.getElementById("message").textContent = "";
 
-  let pairs = Math.min(3 + currentLevel, 10); // عدد الأزواج يزيد تدريجيًا
+  let pairs = Math.min(3 + currentLevel, 10);
   let symbols = allSymbols.slice(0, pairs);
   let cards = [...symbols, ...symbols].sort(()=>0.5-Math.random());
 
@@ -101,20 +125,22 @@ function startLevel(){
   });
 
   timer = setInterval(()=>{
-    time--;
-    document.getElementById("time").textContent = time;
-    if(time === 0){
-      clearInterval(timer);
-      setTimeout(()=>{
-        alert("⏰ الوقت خلص! هنعيد نفس المستوى");
-        startLevel(); // يعيد نفس المستوى
-      },200);
+    if(!isPaused){
+      time--;
+      document.getElementById("time").textContent = time;
+      if(time === 0){
+        clearInterval(timer);
+        setTimeout(()=>{
+          alert("⏰ الوقت خلص! هنعيد نفس المستوى");
+          startLevel();
+        },200);
+      }
     }
   },1000);
 }
 
 function flip(card){
-  if(lock || card.classList.contains("open")) return;
+  if(lock || card.classList.contains("open") || isPaused) return;
 
   card.textContent = card.dataset.sym;
   card.classList.add("open");
@@ -150,13 +176,12 @@ function checkWin(){
 
   if(matched === total){
     clearInterval(timer);
-    document.getElementById("message").textContent = "👑 عاش استمر 👑";
-
+    document.getElementById("message").textContent = "👑 إعاش استمر 👑";
     setTimeout(()=>{
       if(currentLevel < 20){
         currentLevel++;
         startLevel();
-      }else{
+      } else {
         alert("🏆 مبروك! خلصت كل المستويات يا بطل 👑");
       }
     },1500);
