@@ -32,7 +32,7 @@ h2{margin:8px 0}
 }
 .card{
   aspect-ratio:1/1;
-  background:#1e88e5;
+  background:#98FB98;
   border-radius:10px;
   font-size:28px;
   display:flex;
@@ -42,7 +42,7 @@ h2{margin:8px 0}
   user-select:none;
 }
 .card.open,.card.matched{
-  background:#fff;
+  background:#D2B48C;
   color:#000;
   cursor:default;
 }
@@ -79,7 +79,7 @@ h2{margin:8px 0}
 <script>
 const allSymbols = ["🍎","🍌","🍓","🍇","🍒","🍍","🥝","🍉","🍑","🍋","🍊","🥥","🍐","🥭","🍈","🍏"];
 let currentLevel = 1;
-let first=null, lock=false, moves=0, time=120, timer;
+let first=null, lock=false, moves=25, time=120, timer;
 
 function startLevel(){
   clearInterval(timer);
