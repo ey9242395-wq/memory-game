@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الذاكرة</title>
-
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:#121212;
+  background-image:url('https://i.ibb.co/wNFj1Rn4/1000072520.jpg');
   color:#fff;
   display:flex;
   justify-content:center;
@@ -32,7 +31,7 @@ h2{margin:8px 0}
 }
 .card{
   aspect-ratio:1/1;
-  background:#98FB98;
+  background:#1e88;
   border-radius:10px;
   font-size:28px;
   display:flex;
@@ -42,7 +41,7 @@ h2{margin:8px 0}
   user-select:none;
 }
 .card.open,.card.matched{
-  background:#D2B48C;
+  background:#fff;
   color:#000;
   cursor:default;
 }
@@ -57,40 +56,34 @@ h2{margin:8px 0}
 }
 </style>
 </head>
-
 <body>
 <div class="game">
   <h2>🧠 لعبة الذاكرة</h2>
-
   <div class="level">
     المستوى: <span id="level">1</span> / 20
   </div>
-
   <div class="info">
     <div>⏱️ <span id="time">120</span>s</div>
     <div>🔁 <span id="moves">0</span></div>
   </div>
-
   <div class="message" id="message"></div>
-
   <div class="grid" id="grid"></div>
 </div>
 
 <script>
 const allSymbols = ["🍎","🍌","🍓","🍇","🍒","🍍","🥝","🍉","🍑","🍋","🍊","🥥","🍐","🥭","🍈","🍏"];
 let currentLevel = 1;
-let first=null, lock=false, moves=25, time=120, timer;
+let first=null, lock=false, moves=0, time=120, timer;
 
 function startLevel(){
   clearInterval(timer);
   first=null; lock=false; moves=0; time=120;
-
   document.getElementById("moves").textContent = 0;
   document.getElementById("time").textContent = time;
   document.getElementById("level").textContent = currentLevel;
   document.getElementById("message").textContent = "";
 
-  let pairs = Math.min(3 + currentLevel, 10);
+  let pairs = Math.min(3 + currentLevel, 10); // عدد الأزواج يزيد تدريجيًا
   let symbols = allSymbols.slice(0, pairs);
   let cards = [...symbols, ...symbols].sort(()=>0.5-Math.random());
 
@@ -110,13 +103,11 @@ function startLevel(){
   timer = setInterval(()=>{
     time--;
     document.getElementById("time").textContent = time;
-
     if(time === 0){
       clearInterval(timer);
       setTimeout(()=>{
-        alert("⏰ الوقت خلص! الرجوع للمستوى الأول");
-        currentLevel = 1;
-        startLevel();
+        alert("⏰ الوقت خلص! هنعيد نفس المستوى");
+        startLevel(); // يعيد نفس المستوى
       },200);
     }
   },1000);
@@ -159,14 +150,14 @@ function checkWin(){
 
   if(matched === total){
     clearInterval(timer);
-    document.getElementById("message").textContent = "👑 إياد باشا 👑";
+    document.getElementById("message").textContent = "👑 عاش استمر 👑";
 
     setTimeout(()=>{
       if(currentLevel < 20){
         currentLevel++;
         startLevel();
       }else{
-        alert("🏆 مبروك! خلصت كل المستويات يا إياد باشا 👑");
+        alert("🏆 مبروك! خلصت كل المستويات يا بطل 👑");
       }
     },1500);
   }
