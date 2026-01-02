@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الذاكرة</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#121212;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+}
+.game{
+  width:100%;
+  max-width:360px;
+  padding:15px;
+  text-align:center;
+}
+h2{margin:8px 0}
+.info{
+  display:flex;
+  justify-content:space-between;
+  margin:10px 0;
+}
+.grid{
+  display:grid;
+  gap:10px;
+}
+.card{
+  aspect-ratio:1/1;
+  background:#1e88e5;
+  border-radius:10px;
+  font-size:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+}
+.card.open,.card.matched{
+  background:#fff;
+  color:#000;
+  cursor:default;
+}
+.level{
+  margin:6px 0;
+}
+.message{
+  margin:10px 0;
+  font-size:18px;
+  color:#ffd54f;
+  min-height:24px;
+}
+</style>
+</head>
+
+<body>
+<div class="game">
+  <h2>🧠 لعبة الذاكرة</h2>
+
+  <div class="level">
+    المستوى: <span id="level">1</span> / 20
+  </div>
+
+  <div class="info">
+    <div>⏱️ <span id="time">120</span>s</div>
+    <div>🔁 <span id="moves">0</span></div>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const allSymbols = ["🍎","🍌","🍓","🍇","🍒","🍍","🥝","🍉","🍑","🍋","🍊","🥥","🍐","🥭","🍈","🍏"];
+let currentLevel = 1;
+let first=null, lock=false, moves=0, time=120, timer;
+
+function startLevel(){
+  clearInterval(timer);
+  first=null; lock=false; moves=0; time=120;
+
+  document.getElementById("moves").textContent = 0;
+  document.getElementById("time").textContent = time;
+  document.getElementById("level").textContent = currentLevel;
+  document.getElementById("message").textContent = "";
+
+  let pairs = Math.min(3 + currentLevel, 10);
+  let symbols = allSymbols.slice(0, pairs);
+  let cards = [...symbols, ...symbols].sort(()=>0.5-Math.random());
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  grid.style.gridTemplateColumns =
+    `repeat(${Math.ceil(Math.sqrt(cards.length))},1fr)`;
+
+  cards.forEach(sym=>{
+    const c = document.createElement("div");
+    c.className = "card";
+    c.dataset.sym = sym;
+    c.onclick = ()=>flip(c);
+    grid.appendChild(c);
+  });
+
+  timer = setInterval(()=>{
+    time--;
+    document.getElementById("time").textContent = time;
+
+    if(time === 0){
+      clearInterval(timer);
+      setTimeout(()=>{
+        alert("⏰ الوقت خلص! الرجوع للمستوى الأول");
+        currentLevel = 1;
+        startLevel();
+      },200);
+    }
+  },1000);
+}
+
+function flip(card){
+  if(lock || card.classList.contains("open")) return;
+
+  card.textContent = card.dataset.sym;
+  card.classList.add("open");
+
+  if(!first){
+    first = card;
+  }else{
+    moves++;
+    document.getElementById("moves").textContent = moves;
+
+    if(first.dataset.sym === card.dataset.sym){
+      first.classList.add("matched");
+      card.classList.add("matched");
+      first = null;
+      checkWin();
+    }else{
+      lock = true;
+      setTimeout(()=>{
+        first.textContent="";
+        card.textContent="";
+        first.classList.remove("open");
+        card.classList.remove("open");
+        first=null;
+        lock=false;
+      },700);
+    }
+  }
+}
+
+function checkWin(){
+  const matched = document.querySelectorAll(".matched").length;
+  const total = document.querySelectorAll(".card").length;
+
+  if(matched === total){
+    clearInterval(timer);
+    document.getElementById("message").textContent = "👑 إياد باشا 👑";
+
+    setTimeout(()=>{
+      if(currentLevel < 20){
+        currentLevel++;
+        startLevel();
+      }else{
+        alert("🏆 مبروك! خلصت كل المستويات يا إياد باشا 👑");
+      }
+    },1500);
+  }
+}
+
+startLevel();
+</script>
+</body>
+</html>
